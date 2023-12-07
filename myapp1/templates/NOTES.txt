@@ -1,0 +1,1 @@
+Note the information you need here: Youssef DEVOPS install  namespace: {{ .Values.namespace }} nad th appname : {{ .Values.appName }}

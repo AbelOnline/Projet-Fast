@@ -1,0 +1,17 @@
+appName: pgadmin-dev
+
+fastapiName: fastapi-dev
+
+namespace: dev
+
+pvcName: postgres-pv-claim-dev
+
+storageClassName: stclassname-dev
+
+pvName: postgres-pv-dev
+
+clusterIssuerName: letsencrypt-dev
+
+
+hostIngress1: www.devops-youss.cloudns.ph
+hostIngress2: pgadmin.devops-youss.cloudns.ph

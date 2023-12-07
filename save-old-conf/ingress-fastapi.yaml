@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-fastapi
+  namespace: dev
+  annotations:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Ajoutez vos annotations ici
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.devops-youss.cloudns.ph 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fastapi-dev
+            port:
+              number: 5000
+      - path: /users
+        pathType: Prefix
+        backend:
+          service:
+            name: fastapi-dev
+            port:
+              number: 5000
+      - path: /users/count
+        pathType: Prefix
+        backend:
+          service:
+            name: fastapi-dev
+            port:
+              number: 5000

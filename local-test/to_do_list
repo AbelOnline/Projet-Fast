@@ -1,0 +1,9 @@
+- Test acceptance: ajout d'un test cohérent avec le build --- à vérifier
+- Ajout stage "Deploiement stagging"
+            définir les tests
+- Mettre en place des variables environnment
+- RBAC à configurer
+- Volumes: revoir les tailles
+- EKS : Test de déploiment
+        Terraform manifest
+- Slack Notification à voir

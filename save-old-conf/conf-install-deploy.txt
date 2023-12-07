@@ -1,0 +1,56 @@
+#Install ingress-controller
+
+	helm upgrade --install ingress-nginx ingress-nginx \
+	  --repo https://kubernetes.github.io/ingress-nginx \
+	  --namespace ingress-nginx --create-namespace 
+	
+	
+#Install cert-manager
+	
+	helm install cert-manager cert-manager \
+--repo https://charts.jetstack.io \
+--create-namespace --namespace cert-manager \
+--set installCRDs=true
+	
+	
+	
+# Install Prometheus-Grafana
+
+	helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+--namespace kube-prometheus-stack --create-namespace \
+--repo https://prometheus-community.github.io/helm-charts
+	
+# expose Grafana
+	
+kubectl create ingress --namespace kube-prometheus-stack grafana \
+--rule=grafana.cloudnative.party/*=kube-prometheus-stack-grafana:80
+
+kubectl create ingress --namespace kube-prometheus-stack grafana \
+--class=nginx --rule="grafana.devops-youss.cloudns.ph/*=kube-prometheus-stack-grafana:80,tls=grafana-secret" \
+--annotation  "cert-manager.io/cluster-issuer=letsencrypt-prod"
+
+
+Grafana credentials
+	• What could the login and password be?
+	• Let's look at the Secrets available in the namespace:
+
+kubectl get secrets --namespace kube-prometheus-stack
+	
+	• There is a kube-prometheus-stack-grafana that looks promising!
+	• Decode the Secret:
+
+kubectl get secret --namespace kube-prometheus-stack \
+kube-prometheus-stack-grafana -o json | jq '.data | map_values(@base64d)'
+	
+
+
+### Test BD insertion
+
+
+
+INSERT INTO users ("id", "name", "email", "password") VALUES
+  (5, 'Nina', 'nina@example.com', 'password'),
+  (1, 'Benjamin', 'benjamin@example.com', 'password'),
+  (2, 'Faycal', 'faycal@example.com', 'password'),
+  (3, 'Nawfal', 'nawfal@example.com', 'password'),
+  (4, 'Fall', 'fall@example.com', 'password');

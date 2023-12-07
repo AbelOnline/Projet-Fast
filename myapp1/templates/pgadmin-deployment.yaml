@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.appName}}
+  name: {{ .Values.appName}}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.appName}}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName}}
+    spec:
+      containers:
+        - env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: admin@admin.com
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-pgadmin-userpass
+                  key: password
+          image: dpage/pgadmin4
+          name: {{ .Values.appName}}
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: db
+  name: {{ .Values.pvcName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce  
+  resources:
+    requests:
+      storage: 100Mi
+

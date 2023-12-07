@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-fastapi
+  namespace: {{ .Values.namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuerNameProd }}
+    # Ajoutez vos annotations ici
+spec:
+  tls:
+   - hosts:
+     - {{ .Values.hostIngress1 }}
+     secretName: letsencrypt-prod2
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.hostIngress1 }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.fastapiName }}
+            port:
+              number: 5000
+      - path: /users
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.fastapiName }}
+            port:
+              number: 5000
+      - path: /users/count
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.fastapiName }}
+            port:
+              number: 5000
