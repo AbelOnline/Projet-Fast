@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #kubernetes-devops-project
 
 Projet Fil Rouge Bootcamp DEVOPS 2023 
@@ -20,3 +21,6 @@ git@github.com:yousskadi/EKS-Config-terraform.git
 
 Push test
  
+=======
+# Projet-Fast
+>>>>>>> 2e8f0c651f07316d60d75780ff1e7ca90aeced1e
