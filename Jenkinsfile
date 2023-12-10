@@ -160,13 +160,13 @@ agent any
      post {
          success {
              script {
-                 slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+                 echo "propre"
              }
          }
         
         failure {
              script {
-                 slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+                 echo "pas propre"
            }
         }
     
