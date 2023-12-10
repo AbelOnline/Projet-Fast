@@ -169,16 +169,7 @@ agent any
                  slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
            }
         }
-    //     // ..
-        
-    //     failure {
-    //         echo "This will run if the job failed"
-    //         mail to: "youssef.kadi@gmail.com",
-    //             subject: "${env.JOB_NAME} - Build # ${env.BUILD_ID} has failed",
-    //             body: "For more info on the pipeline failure, check out the console output at ${env.BUILD_URL}"
-    //     }
-        
-    //     // ..
+    
     // }
 }
 }
