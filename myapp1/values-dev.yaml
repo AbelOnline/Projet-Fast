@@ -13,5 +13,5 @@ pvName: postgres-pv-dev
 clusterIssuerName: letsencrypt-dev
 
 
-hostIngress1: www.devops-youss.cloudns.ph
-hostIngress2: pgadmin.devops-youss.cloudns.ph
+hostIngress1: https://www.examabel.cloudns.ph.
+hostIngress2: pgadmin.examabel.cloudns.ph
