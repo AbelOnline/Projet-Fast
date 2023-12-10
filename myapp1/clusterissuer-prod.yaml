@@ -5,7 +5,7 @@ metadata:
 spec:
   acme:
 # Remember to update this if you use this manifest to obtain real certificates :
-    email: ykadi.ykadi@gmail.com
+    email: ypabel75@gmail.com
 # server:https://acme-staging-v02.api.letsencrypt.org/directory
 # To use the production environment, use the following line instead:
     server: https://acme-v02.api.letsencrypt.org/directory
