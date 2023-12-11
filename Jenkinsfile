@@ -3,7 +3,7 @@ pipeline {
     DOCKER_ID = "abeldevops1" // replace this with your docker-id
     DOCKER_IMAGE = "datascientestapi"
     DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
-    DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+    DOCKER_PASS = nsVKL9X8g6$+$k%
     //AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
    // AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY') 
     //AWS_DEFAULT_REGION = "eu-west-3" //
