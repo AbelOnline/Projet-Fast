@@ -3,7 +3,7 @@ pipeline {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
-        DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+        DOCKER_PASS = credentials("DOCKER_HUB_SECRET")
     }
 
     agent any
@@ -68,7 +68,7 @@ pipeline {
         stage('Docker Push') { 
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
+                    withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_PASS')]) {
                         sh '''
                         docker login -u $DOCKER_ID -p $DOCKER_PASS
                         docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
