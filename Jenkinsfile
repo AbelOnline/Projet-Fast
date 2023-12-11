@@ -75,17 +75,19 @@ agent any
             }
         }
         
-        // Push the docker image built on dockerhub
-        stage('Docker Push') { 
-            steps {
-                script {
+stage('Docker Push') { 
+    steps {
+        script {
+            withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
                 sh '''
-                echo "your_password" | docker login -u abeldevops1 --password-stdin
+                echo "$DOCKER_PASS" | docker login -u abeldevops1 --password-stdin
                 docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
                 '''
-                }
             }
         }
+    }
+}
+
 
         stage('Dev deployment') {
             steps {
