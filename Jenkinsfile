@@ -37,7 +37,7 @@ agent any
                      
                         // sh 'cd local-test'
                         sh 'pwd'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/giy/local-test/docker-compose.yml build'
+                        sh 'docker-compose -f /var/lib/jenkins/workspace/git/local-test/docker-compose.yml build'
                         sh 'sleep 6'
                     
                 }
