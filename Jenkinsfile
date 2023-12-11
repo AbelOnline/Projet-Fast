@@ -74,8 +74,8 @@ agent any
                 }
             }
         }
-        
-stage('Docker Push') { 
+
+        stage('Docker Push') { 
     steps {
         script {
             withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
@@ -87,6 +87,7 @@ stage('Docker Push') {
         }
     }
 }
+
 
 
         stage('Dev deployment') {
