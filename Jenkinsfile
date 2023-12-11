@@ -1,81 +1,71 @@
 pipeline {
-    environment { // Declaration of environment variables
-    DOCKER_ID = "abeldevops1" // replace this with your docker-id
-    DOCKER_IMAGE = "datascientestapi"
-    DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
-    DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-    //AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-   // AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY') 
-    //AWS_DEFAULT_REGION = "eu-west-3" //
-}
+    environment {
+        DOCKER_ID = "abeldevops1"
+        DOCKER_IMAGE = "datascientestapi"
+        DOCKER_TAG = "v.${BUILD_ID}.0"
+        DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+    }
 
-agent any 
-    stages { 
+    agent any
+
+    stages {
         stage('Cleanup docker containers and images') {
             steps {
-                script {   
-                 
-                        sh'''    
-                         echo $(docker ps -q)
-                         if [[ $(docker ps -q) ]]; then
-                            echo "Running containers found. Cleaning up..."
-                            docker stop $(docker ps -aq)
-                            docker rm $(docker ps -aq)
-                            docker rmi -f $(docker images -q)
-                        else
-                            echo "No running containers found."
-                        fi  
-                        '''
+                script {
+                    sh'''    
+                    echo $(docker ps -q)
+                    if [[ $(docker ps -q) ]]; then
+                        echo "Running containers found. Cleaning up..."
+                        docker stop $(docker ps -aq)
+                        docker rm $(docker ps -aq)
+                        docker rmi -f $(docker images -q)
+                    else
+                        echo "No running containers found."
+                    fi  
+                    '''
                 }
             }
         }
 
-        // Build docker image
         stage('Docker image build') {
             steps {
                 script {
-                     
-                        // sh 'cd local-test'
-                        sh 'pwd'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/git/local-test/docker-compose.yml build'
-                        sh 'sleep 6'
-                    
+                    sh 'pwd'
+                    sh 'docker-compose -f /var/lib/jenkins/workspace/git/local-test/docker-compose.yml build'
+                    sh 'sleep 6'
                 }
             }
         }
-        // Run the docker image
+
         stage('Docker image up') {
-                steps {
+            steps {
                 script {
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/git/local-test/docker-compose.yml up -d'
-                        // sh ' cd .. '
-                        sh 'sleep 10'
-                        
+                    sh 'docker-compose -f /var/lib/jenkins/workspace/git/local-test/docker-compose.yml up -d'
+                    sh 'sleep 10'
                 }
             }
         }
         
-      stage('Image test') {
+        stage('Image test') {
             steps {
                 script {
-
                     sh 'curl http://0.0.0.0:5000'
-                }                           
+                }
             }
         } 
 
         stage('Build and tag docker image for dockerhub') {
             steps {
                 script {
-                sh '''
-                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
-                sleep 6
-                '''
+                    sh '''
+                    docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
+                    sleep 6
+                    '''
                 }
             }
         }
 
-      stage('Docker Push') { 
+        stage('Docker Push') { 
             steps {
                 script {
                     withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
@@ -87,10 +77,6 @@ agent any
                 }
             }
         }
-    }
-}
-
-
 
         stage('Dev deployment') {
             steps {
@@ -114,7 +100,6 @@ agent any
                     --namespace kube-prometheus-stack --create-namespace \
                     --repo https://prometheus-community.github.io/helm-charts
 
-
                     echo "Installation Projet Devops 2023"
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                     helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
@@ -134,16 +119,14 @@ agent any
                         echo "La chaîne 'toto' a été trouvée dans la réponse."
                     else
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi'''
-                    
+                    fi
+                    '''
                 }
             }
         }
         
         stage('Production deployment') {
             steps {
-                // Create an Approval Button with a timeout of 15minutes.
-                // this require a manuel validation in order to deploy on production environment
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Do you want to deploy in production ?', ok: 'Yes'
                 }
@@ -157,23 +140,19 @@ agent any
                 }
             }
         }
-
-        
+    }
     
-    
-     post {
-         success {
-             script {
-                 echo "propre"
-             }
-         }
+    post {
+        success {
+            script {
+                echo "propre"
+            }
+        }
         
         failure {
-             script {
-                 echo "pas propre"
-           }
+            script {
+                echo "pas propre"
+            }
         }
-    
-    // }
-}
+    }
 }
