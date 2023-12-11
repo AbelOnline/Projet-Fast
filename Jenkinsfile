@@ -3,7 +3,6 @@ pipeline {
     DOCKER_ID = "Abeldevops1" // replace this with your docker-id
     DOCKER_IMAGE = "datascientestapi"
     DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
-    KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
     DOCKER_PASS = credentials("DOCKER_HUB_PASS")
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
