@@ -68,7 +68,7 @@ pipeline {
        stage('Docker Tag and Push') {
     steps {
         script {
-            withCredentials([string(: varaible: 'DOCKER_ID', credentialsId: 'DOCKER_ID')]) {
+            withCredentials([string(: variable: 'DOCKER_ID', credentialsId: 'DOCKER_ID')]) {
                 // Assurez-vous que DOCKER_ID, DOCKER_IMAGE, DOCKER_TAG sont définis en tant que variables d'environnement dans votre pipeline Jenkins.
                 // Vous pouvez les définir dans votre pipeline ou les obtenir à partir de votre code source ou d'autres sources.
                 
