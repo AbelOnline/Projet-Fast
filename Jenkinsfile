@@ -76,17 +76,15 @@ agent any
         }
 
         stage('Docker Push') { 
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
+            steps {
+                script {
                 sh '''
-                echo "$DOCKER_PASS" | docker login -u abeldevops1 --password-stdin
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
                 docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
                 '''
+                }
             }
         }
-    }
-}
 
 
 
