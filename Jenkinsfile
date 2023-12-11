@@ -80,7 +80,7 @@ agent any
             steps {
                 script {
                 sh '''
-                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                echo "your_password" | docker login -u abeldevops1 --password-stdin
                 docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
                 '''
                 }
