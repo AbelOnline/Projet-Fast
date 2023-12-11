@@ -65,18 +65,30 @@ pipeline {
             }
         }
 
-        stage('Docker Push') { 
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_PASS')]) {
-                        sh '''
-                        docker login -u $DOCKER_ID -p $DOCKER_PASS
-                        docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-                        '''
-                    }
-                }
+       stage('Docker Tag and Push') {
+    steps {
+        script {
+            withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_PASS')]) {
+                // Assurez-vous que DOCKER_ID, DOCKER_IMAGE, DOCKER_TAG sont définis en tant que variables d'environnement dans votre pipeline Jenkins.
+                // Vous pouvez les définir dans votre pipeline ou les obtenir à partir de votre code source ou d'autres sources.
+                
+                def dockerId = env.DOCKER_ID
+                def dockerImage = env.DOCKER_IMAGE
+                def dockerTag = env.DOCKER_TAG
+
+                sh """
+                docker login -u $dockerId -p $DOCKER_PASS
+
+                # Tag l'image avec le nouveau tag
+                docker tag $dockerId/$dockerImage:$dockerTag $dockerId/$dockerImage:NouveauTag
+
+                # Poussez l'image taggée
+                docker push $dockerId/$dockerImage:NouveauTag
+                """
             }
         }
+    }
+}
 
         stage('Dev deployment') {
             steps {
