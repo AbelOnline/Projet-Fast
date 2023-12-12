@@ -110,7 +110,8 @@ pipeline {
             --namespace ingress-nginx --create-namespace
             sleep 10
 
-            // Reste de votre code de déploiement
+            // Reste de votre code de déploiement peut être ajouté ici
+            // Assurez-vous de respecter la syntaxe et les étapes appropriées pour votre application.
         }
     }
 }
