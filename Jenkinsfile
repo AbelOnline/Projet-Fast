@@ -68,19 +68,19 @@ pipeline {
        stage('Docker Tag and Push') {
     steps {
         script {
-            withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_ID')]) {
+            withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_HUB_SECRET')]) {
                 // Assurez-vous que DOCKER_ID, DOCKER_IMAGE, DOCKER_TAG sont définis en tant que variables d'environnement dans votre pipeline Jenkins.
                 // Vous pouvez les définir dans votre pipeline ou les obtenir à partir de votre code source ou d'autres sources.
-                
+
                 def dockerId = env.DOCKER_ID
                 def dockerImage = env.DOCKER_IMAGE
                 def dockerTag = env.DOCKER_TAG
                 def dockerHubSecret = env.DOCKER_HUB_SECRET
 
+                // Utilisez l'option --password-stdin pour éviter de passer le mot de passe directement
                 sh """
-                docker login -u $dockerId --password-stdin < "$dockerHubSecret"
-
-
+                echo '$dockerHubSecret' | docker login -u $dockerId --password-stdin
+                
                 # Tag l'image avec le nouveau tag
                 docker tag $dockerId/$dockerImage:$dockerTag $dockerId/$dockerImage:NouveauTag
 
