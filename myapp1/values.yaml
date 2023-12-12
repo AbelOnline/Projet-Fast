@@ -7,7 +7,7 @@ fastapiNodeport: fastapinodeport
 namespace: default
 
 image:
-  name: ykadi/datascientestapi
+  name: abeldevops1/datascientestapi
   tag: ""
 
 #hostIngress1: www.devops-youss.cloudns.ph
