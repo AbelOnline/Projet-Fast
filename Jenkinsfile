@@ -3,8 +3,6 @@ pipeline {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         KUBECONFIG_1 = credentials("KUBECONFIG_PART_1")
         KUBECONFIG_2 = credentials("KUBECONFIG_PART_2")
         AWS_DEFAULT_REGION = "eu-west-3"
