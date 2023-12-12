@@ -3,7 +3,7 @@ pipeline {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
-        KUBECONFIG = credentials("EKS-config")
+        KUBECONFIG = 'kubeconfig.yaml'
         AWS_DEFAULT_REGION = "eu-west-3"
         DOCKER_HUB_SECRET = credentials("DOCKER_HUB_SECRET")
     }
