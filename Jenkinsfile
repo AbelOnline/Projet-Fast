@@ -75,6 +75,7 @@ pipeline {
                 def dockerId = env.DOCKER_ID
                 def dockerImage = env.DOCKER_IMAGE
                 def dockerTag = env.DOCKER_TAG
+                def dockerHubSecret = env.DOCKER_HUB_SECRET
 
                 sh """
                 docker login -u $dockerId --password-stdin < "$dockerHubSecret"
