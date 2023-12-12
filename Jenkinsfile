@@ -131,8 +131,30 @@ pipeline {
 
                     echo "Installation Projet Devops 2023"
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1
-                    stage('Production deployment') {
+                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+                    kubectl apply -f myapp1/clusterissuer-prod.yaml
+                    sleep 10
+                    '''
+                }
+            }
+        }
+
+        stage('Staging deployment') {
+            steps {
+                script {
+                    sh '''
+                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "listen@email.com","password": "passwordtoto"}' https://www.examabel.cloudns.ph.
+                    if curl -k -i -H 'accept: application/json' https://www.examabel.cloudns.ph/users | grep -qF "toto"; then
+                        echo "La chaîne 'toto' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
+                    fi
+                    '''
+                }
+            }
+        }
+        
+        stage('Production deployment') {
             steps {
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Do you want to deploy in production ?', ok: 'Yes'
