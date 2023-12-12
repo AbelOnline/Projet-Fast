@@ -102,7 +102,7 @@ pipeline {
             sh 'aws configure set region eu-west-3 --profile Abel'
 
             // Mise à jour de kubeconfig pour le cluster EKS
-            sh 'aws eks update-kubeconfig --name example --region eu-west-3 --profile Abel'
+            sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
 
             echo "Installation Ingress-controller Nginx"
             helm upgrade --install ingress-nginx ingress-nginx \
