@@ -17,7 +17,7 @@ spec:
         app: fastapi
     spec:
       containers:
-        - image: ykadi/projet-devops-kubernetes_fastapi:latest
+        - image: abeldevops1/projet-devops-kubernetes_fastapi:latest
           name: fastapi
           ports:
             - containerPort: 5000
