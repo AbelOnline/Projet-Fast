@@ -95,37 +95,41 @@ pipeline {
     }
 }
 
-        stage('Dev deployment') {
-            steps {
-                script {
-                    sh '''
-                    echo "Installation Ingress-controller Nginx"
-                    helm upgrade --install ingress-nginx ingress-nginx \
-                    --repo https://kubernetes.github.io/ingress-nginx \
-                    --namespace ingress-nginx --create-namespace     
-                    sleep 10
+       stage('Dev deployment') {
+    steps {
+        script {
+            sh '''
+            echo "$KUBECONFIG_PART_1$KUBECONFIG_PART_2" > kubeconfig.yaml
+            kubectl config use-context arn:aws:eks:eu-west-3:714562008810:cluster/eks
 
-                    echo "Installation Cert-Manager"
-                    helm upgrade --install cert-manager cert-manager \
-                    --repo https://charts.jetstack.io \
-                    --create-namespace --namespace cert-manager \
-                    --set installCRDs=true
-                    sleep 10
-                    
-                    echo "Installation stack Prometheus-Grafana"
-                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
-                    --namespace kube-prometheus-stack --create-namespace \
-                    --repo https://prometheus-community.github.io/helm-charts
+            echo "Installation Ingress-controller Nginx"
+            helm upgrade --install ingress-nginx ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx --create-namespace
+            sleep 10
 
-                    echo "Installation Projet Devops 2023"
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
-                    kubectl apply -f myapp1/clusterissuer-prod.yaml    
-                    sleep 10
-                    '''
-                }
-            }           
+            echo "Installation Cert-Manager"
+            helm upgrade --install cert-manager cert-manager \
+            --repo https://charts.jetstack.io \
+            --create-namespace --namespace cert-manager \
+            --set installCRDs=true
+            sleep 10
+
+            echo "Installation stack Prometheus-Grafana"
+            helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+            --namespace kube-prometheus-stack --create-namespace \
+            --repo https://prometheus-community.github.io/helm-charts
+
+            echo "Installation Projet Devops 2023"
+            sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+            helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+            kubectl apply -f myapp1/clusterissuer-prod.yaml
+            sleep 10
+            '''
         }
+    }
+}
+
 
         stage('Staging deployment') {
             steps {
