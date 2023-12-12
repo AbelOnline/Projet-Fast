@@ -3,6 +3,8 @@ pipeline {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         KUBECONFIG_1 = credentials("KUBECONFIG_PART_1")
         KUBECONFIG_2 = credentials("KUBECONFIG_PART_2")
         AWS_DEFAULT_REGION = "eu-west-3"
@@ -68,112 +70,65 @@ pipeline {
             }
         }
 
-       stage('Docker Tag and Push') {
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_HUB_SECRET')]) {
-                // Assurez-vous que DOCKER_ID, DOCKER_IMAGE, DOCKER_TAG sont définis en tant que variables d'environnement dans votre pipeline Jenkins.
-                // Vous pouvez les définir dans votre pipeline ou les obtenir à partir de votre code source ou d'autres sources.
-
-                def dockerId = env.DOCKER_ID
-                def dockerImage = env.DOCKER_IMAGE
-                def dockerTag = env.DOCKER_TAG
-                def dockerHubSecret = env.DOCKER_HUB_SECRET
-
-                // Utilisez l'option --password-stdin pour éviter de passer le mot de passe directement
-                sh """
-                echo '$dockerHubSecret' | docker login -u $dockerId --password-stdin
-                
-                # Tag l'image avec le nouveau tag
-                docker tag $dockerId/$dockerImage:$dockerTag $dockerId/$dockerImage:NouveauTag
-
-                # Poussez l'image taggée
-                docker push $dockerId/$dockerImage:NouveauTag
-                """
-            }
-        }
-    }
-}
-
-       stage('Dev deployment') {
-    steps {
-        script {
-            sh '''
-            echo "$KUBECONFIG_PART_1$KUBECONFIG_PART_2" > kubeconfig.yaml
-            kubectl config use-context arn:aws:eks:eu-west-3:714562008810:cluster/eks
-
-            echo "Installation Ingress-controller Nginx"
-            helm upgrade --install ingress-nginx ingress-nginx \
-            --repo https://kubernetes.github.io/ingress-nginx \
-            --namespace ingress-nginx --create-namespace
-            sleep 10
-
-            echo "Installation Cert-Manager"
-            helm upgrade --install cert-manager cert-manager \
-            --repo https://charts.jetstack.io \
-            --create-namespace --namespace cert-manager \
-            --set installCRDs=true
-            sleep 10
-
-            echo "Installation stack Prometheus-Grafana"
-            helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
-            --namespace kube-prometheus-stack --create-namespace \
-            --repo https://prometheus-community.github.io/helm-charts
-
-            echo "Installation Projet Devops 2023"
-            sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-            helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
-            kubectl apply -f myapp1/clusterissuer-prod.yaml
-            sleep 10
-            '''
-        }
-    }
-}
-
-
-        stage('Staging deployment') {
+        stage('Docker Tag and Push') {
             steps {
                 script {
-                    sh '''
-                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "listen@email.com","password": "passwordtoto"}' https://www.examabel.cloudns.ph.
-                    if curl -k -i -H 'accept: application/json' https://www.examabel.cloudns.ph/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi
-                    '''
+                    withCredentials([string(credentialsId: 'DOCKER_HUB_SECRET', variable: 'DOCKER_HUB_SECRET')]) {
+                        // Assurez-vous que DOCKER_ID, DOCKER_IMAGE, DOCKER_TAG sont définis en tant que variables d'environnement dans votre pipeline Jenkins.
+                        // Vous pouvez les définir dans votre pipeline ou les obtenir à partir de votre code source ou d'autres sources.
+
+                        def dockerId = env.DOCKER_ID
+                        def dockerImage = env.DOCKER_IMAGE
+                        def dockerTag = env.DOCKER_TAG
+                        def dockerHubSecret = env.DOCKER_HUB_SECRET
+
+                        // Utilisez l'option --password-stdin pour éviter de passer le mot de passe directement
+                        sh """
+                        echo '$dockerHubSecret' | docker login -u $dockerId --password-stdin
+                        
+                        # Tag l'image avec le nouveau tag
+                        docker tag $dockerId/$dockerImage:$dockerTag $dockerId/$dockerImage:NouveauTag
+
+                        # Poussez l'image taggée
+                        docker push $dockerId/$dockerImage:NouveauTag
+                        """
+                    }
                 }
             }
         }
-        
-        stage('Production deployment') {
+
+        stage('Dev deployment') {
             steps {
-                timeout(time: 15, unit: "MINUTES") {
-                    input message: 'Do you want to deploy in production ?', ok: 'Yes'
-                }
                 script {
+                    // Connexion à AWS en utilisant les informations d'identification AWS
+                    withCredentials([string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'), string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
+                        sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
+                    }
+                    
+                    // Utilisation du kubeconfig pour EKS
                     sh '''
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
-                    kubectl apply -f myapp1/ingress-grafana.yaml
-                    kubectl apply -f myapp1/clusterissuer-prod.yaml
-                    '''
-                }
-            }
-        }
-    }
-    
-    post {
-        success {
-            script {
-                echo "propre"
-            }
-        }
-        
-        failure {
-            script {
-                echo "pas propre"
-            }
-        }
-    }
-}
+                    echo "$KUBECONFIG_PART_1$KUBECONFIG_PART_2" > kubeconfig.yaml
+                    kubectl config use-context arn:aws:eks:eu-west-3:714562008810:cluster/eks
+
+                    echo "Installation Ingress-controller Nginx"
+                    helm upgrade --install ingress-nginx ingress-nginx \
+                    --repo https://kubernetes.github.io/ingress-nginx \
+                    --namespace ingress-nginx --create-namespace
+                    sleep 10
+
+                    echo "Installation Cert-Manager"
+                    helm upgrade --install cert-manager cert-manager \
+                    --repo https://charts.jetstack.io \
+                    --create-namespace --namespace cert-manager \
+                    --set installCRDs=true
+                    sleep 10
+
+                    echo "Installation stack Prometheus-Grafana"
+                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+                    --namespace kube-prometheus-stack --create-namespace \
+                    --repo https://prometheus-community.github.io/helm-charts
+
+                    echo "Installation Projet Devops 2023"
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1
