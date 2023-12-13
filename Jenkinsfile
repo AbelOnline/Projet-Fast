@@ -1,29 +1,3 @@
-Skip to content
-AbelOnline
-/
-Projet-Fast
-
-Type / to search
-
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-Commit
-Update Jenkinsfile
- main
-@AbelOnline
-AbelOnline committed 18 hours ago 
-1 parent 1e25e4e
-commit 14d1c2b
-Showing 1 changed file with 4 additions and 0 deletions.
-  4 changes: 4 additions & 0 deletions4  
-Jenkinsfile
 pipeline {
     environment {
         DOCKER_ID = "abeldevops1"
@@ -179,20 +153,3 @@ pipeline {
         }
     }
 }
-0 comments on commit 14d1c2b
-@AbelOnline
-Comment
- 
-Leave a comment
- 
- You’re receiving notifications because you’re watching this repository.
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact
-Manage cookiesDo not share my personal informationCopied!
