@@ -3,6 +3,10 @@ pipeline {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        KUBECONFIG_1 = credentials("KUBECONFIG_PART_1")
+        KUBECONFIG_2 = credentials("KUBECONFIG_PART_2")
         AWS_DEFAULT_REGION = "eu-west-3"
         DOCKER_HUB_SECRET = credentials("DOCKER_HUB_SECRET")
     }
@@ -93,33 +97,40 @@ pipeline {
     }
 }
 
-        stage('Dev deployment') {
+       stage('Dev deployment') {
     steps {
         script {
-            // Configurer le profil AWS "Abel"
-            sh 'aws configure set aws_access_key_id AKIA2MXZW63VD7RDXRBQ --profile Abel'
-            sh 'aws configure set aws_secret_access_key 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 --profile Abel'
-            sh 'aws configure set region eu-west-3 --profile Abel'
-
-            // Mise à jour de kubeconfig pour le cluster EKS
-            sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
+            sh '''
+            echo "$KUBECONFIG_PART_1$KUBECONFIG_PART_2" > kubeconfig.yaml
+            kubectl config use-context arn:aws:eks:eu-west-3:714562008810:cluster/eks
 
             echo "Installation Ingress-controller Nginx"
-            /snap/bin/helm upgrade --install ingress-nginx ingress-nginx \
+            helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace
+            sleep 10
+
+            echo "Installation Cert-Manager"
+            helm upgrade --install cert-manager cert-manager \
+            --repo https://charts.jetstack.io \
+            --create-namespace --namespace cert-manager \
+            --set installCRDs=true
+            sleep 10
+
+            echo "Installation stack Prometheus-Grafana"
+            helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+            --namespace kube-prometheus-stack --create-namespace \
+            --repo https://prometheus-community.github.io/helm-charts
+
+            echo "Installation Projet Devops 2023"
+            sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+            helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+            kubectl apply -f myapp1/clusterissuer-prod.yaml
+            sleep 10
+            '''
         }
     }
 }
-
-
-
-            // Reste de votre code de déploiement peut être ajouté ici
-            // Assurez-vous de respecter la syntaxe et les étapes appropriées pour votre application.
-        }
-    }
-}
-
 
 
         stage('Staging deployment') {
