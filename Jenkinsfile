@@ -104,7 +104,7 @@ pipeline {
         }
     }
 }
-       stages {
+     stages {
         stage('Staging Deployment') {
             steps {
                 script {
@@ -164,4 +164,4 @@ pipeline {
             }
         }
     }
-} }
+}
