@@ -95,6 +95,7 @@ pipeline {
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
             sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
             sh 'helm repo update'
+            sh 'helm delete ingress-nginx --purge || true'
             sh 'helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace'
 
             // Reste de votre code de déploiement
