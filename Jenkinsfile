@@ -104,52 +104,64 @@ pipeline {
         }
     }
 }
-        stage('Staging deployment') {
+       stages {
+        stage('Staging Deployment') {
             steps {
                 script {
-                    sh '''
-                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
-                    if curl -k -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi'''
-                    
-                }
-            }
-        }
-        
-        stage('Production deployment') {
-            steps {
-                // Create an Approval Button with a timeout of 15minutes.
-                // this require a manuel validation in order to deploy on production environment
-                timeout(time: 15, unit: "MINUTES") {
-                    input message: 'Do you want to deploy in production ?', ok: 'Yes'
-                }
-                script {
-                    sh '''
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
-                    kubectl apply -f myapp1/ingress-grafana.yaml
-                    kubectl apply -f myapp1/clusterissuer-prod.yaml
-                    '''
+                    try {
+                        sh '''
+                        curl -k -i -X POST -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                        '''
+                        def response = sh(script: 'curl -k -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users', returnStatus: true)
+                        
+                        if (response == 0) {
+                            echo "The string 'toto' was found in the response."
+                        } else {
+                            echo "The string 'toto' was not found in the response."
+                            error "Staging deployment failed."
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "An error occurred during staging deployment: ${e.message}"
+                    }
                 }
             }
         }
 
-    
-    post {
-        success {
-            script {
-                echo "propre"
-            }
-        }
-        
-        failure {
-            script {
-                echo "pas propre"
+        stage('Production Deployment') {
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    input message: 'Do you want to deploy in production?', ok: 'Yes'
+                }
+
+                script {
+                    try {
+                        sh '''
+                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                        helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
+                        kubectl apply -f myapp1/ingress-grafana.yaml
+                        kubectl apply -f myapp1/clusterissuer-prod.yaml
+                        '''
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "An error occurred during production deployment: ${e.message}"
+                    }
+                }
             }
         }
     }
-}
+
+    post {
+        success {
+            script {
+                echo "Deployment was successful."
+            }
+        }
+
+        failure {
+            script {
+                echo "Deployment failed."
+            }
+        }
+    }
 }
