@@ -81,9 +81,9 @@ pipeline {
                 script {
                     try {
                         sh '''
-                        curl -k -i -X POST -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                        curl -k -i -X POST -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.examabel.cloudns.ph
                         '''
-                        def response = sh(script: 'curl -k -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users', returnStatus: true)
+                        def response = sh(script: 'curl -k -i -H "accept: application/json" https://www.examabel.cloudns.ph/users', returnStatus: true)
                         
                         if (response == 0) {
                             echo "The string 'toto' was found in the response."
