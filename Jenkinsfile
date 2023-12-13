@@ -83,6 +83,7 @@ pipeline {
         }
     }
 }
+
         stage('Dev deployment') {
     steps {
         script {
@@ -92,11 +93,9 @@ pipeline {
             sh 'aws configure set region eu-west-3 --profile Abel'
             // Mise à jour de kubeconfig pour le cluster EKS
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
-            sh 'helm install ingress-nginx ingress-nginx/ingress-nginx \
-            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-            helm repo update
-            --namespace ingress-nginx --create-namespace' 
-
+            sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
+            sh 'helm repo update'
+            sh 'helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace'
 
             // Reste de votre code de déploiement
             // Reste de votre code de déploiement peut être ajouté ici
@@ -104,21 +103,6 @@ pipeline {
         }
     }
 }
-        stage('Staging deployment') {
-            steps {
-                script {
-                    sh '''
-                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "listen@email.com","password": "passwordtoto"}' https://www.examabel.cloudns.ph.
-                    if curl -k -i -H 'accept: application/json' https://www.examabel.cloudns.ph/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi
-                    '''
-                }
-            }
-        }
-        
         stage('Production deployment') {
             steps {
                 timeout(time: 15, unit: "MINUTES") {
