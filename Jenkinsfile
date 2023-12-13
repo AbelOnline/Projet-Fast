@@ -99,8 +99,18 @@ pipeline {
     steps {
         script {
             sh '''
-            echo "$KUBECONFIG_PART_1$KUBECONFIG_PART_2" > kubeconfig.yaml
-            kubectl config use-context arn:aws:eks:eu-west-3:714562008810:cluster/eks
+            sh 'aws configure set aws_access_key_id AKIA2MXZW63VD7RDXRBQ --profile Abel'
+            sh 'aws configure set aws_secret_access_key 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 --profile Abel'
+            sh 'aws configure set region eu-west-3 --profile Abel'
+
+            //Update kubeconfig for the EKS cluster
+            sh 'AWS_PROFILE=Abel aws eks update-kubeconfig --name eks --region eu-west-3'
+
+            // Verify the kubeconfig update
+            sh 'kubectl config current-context'
+
+            // Run kubectl commands as needed
+            sh 'kubectl get pods'
 
             echo "Installation Ingress-controller Nginx"
             helm upgrade --install ingress-nginx ingress-nginx \
