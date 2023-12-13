@@ -104,8 +104,25 @@ pipeline {
         }
     }
 }
+        stage('Staging deployment') {
+            steps {
+                script {
+                    sh '''
+                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                    if curl -k -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
+                        echo "La chaîne 'toto' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
+                    fi'''
+                    
+                }
+            }
+        }
+        
         stage('Production deployment') {
             steps {
+                // Create an Approval Button with a timeout of 15minutes.
+                // this require a manuel validation in order to deploy on production environment
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Do you want to deploy in production ?', ok: 'Yes'
                 }
@@ -119,7 +136,7 @@ pipeline {
                 }
             }
         }
-    }
+
     
     post {
         success {
