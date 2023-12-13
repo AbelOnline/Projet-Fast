@@ -92,14 +92,14 @@ pipeline {
             sh 'aws configure set region eu-west-3 --profile Abel'
             // Mise à jour de kubeconfig pour le cluster EKS
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
+
             echo "Installation Ingress-controller Nginx"
+            /usr/local/bin/helm upgrade --install ingress-nginx ingress-nginx \
+--repo https://kubernetes.github.io/ingress-nginx \
+--namespace ingress-nginx --create-namespace
             /snap/bin/helm upgrade --install ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace
-        }
-    }
-}
-
 
 
             // Reste de votre code de déploiement peut être ajouté ici
