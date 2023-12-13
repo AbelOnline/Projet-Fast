@@ -1,17 +1,16 @@
 pipeline {
+    agent any
     environment {
         DOCKER_ID = "abeldevops1"
         DOCKER_IMAGE = "datascientestapi"
         DOCKER_TAG = "v.${BUILD_ID}.0"
-        AWS_DEFAULT_REGION = "eu-west-3"
         DOCKER_HUB_SECRET = credentials("DOCKER_HUB_SECRET")
     }
-    agent any
     stages {
         stage('Cleanup docker containers and images') {
             steps {
                 script {
-                    sh'''    
+                    sh '''    
                     echo $(docker ps -q)
                     if [[ $(docker ps -q) ]]; then
                         echo "Running containers found. Cleaning up..."
@@ -49,7 +48,7 @@ pipeline {
                 }
             }
         } 
-        stage('Build and tag docker image for dockerhub') {
+        stage('Build and tag docker image for Docker Hub') {
             steps {
                 script {
                     sh '''
@@ -77,17 +76,46 @@ pipeline {
                 }
             }
         }
-        stage('Dev deployment') {
+        stage('Staging Deployment') {
             steps {
                 script {
-                    sh 'aws configure set aws_access_key_id AKIA2MXZW63VD7RDXRBQ --profile Abel'
-                    sh 'aws configure set aws_secret_access_key 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 --profile Abel'
-                    sh 'aws configure set region eu-west-3 --profile Abel'
-                    sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
-                    sh 'helm delete ingress-nginx --purge || true'
-                    sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
-                    sh 'helm repo update'
-                    sh 'helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace'
+                    try {
+                        sh '''
+                        curl -k -i -X POST -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                        '''
+                        def response = sh(script: 'curl -k -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users', returnStatus: true)
+                        
+                        if (response == 0) {
+                            echo "The string 'toto' was found in the response."
+                        } else {
+                            echo "The string 'toto' was not found in the response."
+                            error "Staging deployment failed."
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "An error occurred during staging deployment: ${e.message}"
+                    }
+                }
+            }
+        }
+        stage('Production Deployment') {
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    input message: 'Do you want to deploy in production?', ok: 'Yes'
+                }
+
+                script {
+                    try {
+                        sh '''
+                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                        helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
+                        kubectl apply -f myapp1/ingress-grafana.yaml
+                        kubectl apply -f myapp1/clusterissuer-prod.yaml
+                        '''
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "An error occurred during production deployment: ${e.message}"
+                    }
                 }
             }
         }
@@ -99,6 +127,7 @@ pipeline {
                 echo "Deployment was successful."
             }
         }
+
         failure {
             script {
                 echo "Deployment failed."
