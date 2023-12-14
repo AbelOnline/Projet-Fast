@@ -104,9 +104,9 @@ pipeline {
                     sh '''
                     curl -k -i -X 'POST' -H 'Content-Type: application/json' \
                     -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' \
-                    https://www.devops-youss.cloudns.ph
+                    https://www. examabel.cloudns.ph
                     
-                    if curl -k -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
+                    if curl -k -i -H 'accept: application/json' https://www. examabel.cloudns.ph/users | grep -qF "toto"; then
                         echo "La chaîne 'toto' a été trouvée dans la réponse."
                     else
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
