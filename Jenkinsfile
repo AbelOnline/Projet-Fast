@@ -86,14 +86,6 @@ pipeline {
                     
                     sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
                     
-                    sh 'helm delete ingress-nginx --namespace ingress-nginx --purge || true'
-                    echo "Installation Ingress-controller Nginx"
-                    
-                    sh '''helm upgrade --install ingress-nginx ingress-nginx \
-                          --repo https://kubernetes.github.io/ingress-nginx \
-                          --namespace ingress-nginx --create-namespace
-                          '''
-                    sh 'sleep 10'
                     echo "Installation Projet Devops 2023"
                     
                     sh '''sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
