@@ -89,14 +89,28 @@ pipeline {
         script {
             // Configurer le profil AWS "Abel"
             sh 'aws configure set aws_access_key_id AKIA2MXZW63VMASNZDGJ --profile Abel'
-            sh 'aws configure set aws_secret_access_key  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 --profile Abel'
+            sh 'aws configure set aws_secret_access_key g3yJretgwQjqPptPcI/RAJh+kh4TS6sp0V+XXNij --profile Abel'
             sh 'aws configure set region eu-west-3 --profile Abel'
-            // Mise à jour de kubeconfig pour le cluster EKS
+
+// Mise à jour de kubeconfig pour le cluster EKS
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
+
             sh 'helm delete ingress-nginx --namespace ingress-nginx --purge || true'
+            echo "Installation Ingress-controller Nginx"
+
+            sh 'helm upgrade --install ingress-nginx ingress-nginx' \
+    '--repo https://kubernetes.github.io/ingress-nginx' \
+    'namespace ingress-nginx --create-namespace'
+            sh 'sleep 10'
             sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
             sh 'helm repo update'
             sh 'helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace'
+            echo "Installation Projet Devops 2023"
+
+            sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+            helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+            kubectl apply -f myapp1/clusterissuer-prod.yaml
+            sleep 10
 
             // Reste de votre code de déploiement
             // Reste de votre code de déploiement peut être ajouté ici
