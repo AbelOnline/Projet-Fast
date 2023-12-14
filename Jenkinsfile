@@ -125,8 +125,6 @@ pipeline {
                     sed -i "s+tag.*+tag: \${DOCKER_TAG}+g" myapp1/values.yaml
                     helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml \
                     -f myapp1/values-prod.yaml -n prod --create-namespace
-                    kubectl apply -f myapp1/ingress-grafana.yaml
-                    kubectl apply -f myapp1/clusterissuer-prod.yaml
                     '''
                 }
             }
