@@ -136,6 +136,8 @@ pipeline {
                 }
             }
         }
+            }
+}
 
     
     post {
@@ -150,6 +152,4 @@ pipeline {
                 echo "pas propre"
             }
         }
-    }
-    }
-}
+    
