@@ -152,4 +152,4 @@ pipeline {
                 echo "pas propre"
             }
         }
-    
+    }
