@@ -94,11 +94,6 @@ pipeline {
                           --namespace ingress-nginx --create-namespace
                           '''
                     sh 'sleep 10'
-                    sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
-                    sh 'helm repo update'
-                    sh '''helm install ingress-nginx ingress-nginx/ingress-nginx \
-                          --namespace ingress-nginx --create-namespace
-                          '''
                     echo "Installation Projet Devops 2023"
                     
                     sh '''sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
