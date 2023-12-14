@@ -93,7 +93,7 @@ pipeline {
             sh 'aws configure set region eu-west-3 --profile Abel'
             // Mise à jour de kubeconfig pour le cluster EKS
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
-            sh 'helm delete ingress-nginx --purge || true'
+            sh 'helm delete ingress-nginx --namespace ingress-nginx --purge || true'
             sh 'helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx'
             sh 'helm repo update'
             sh 'helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace'
