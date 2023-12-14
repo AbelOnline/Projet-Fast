@@ -88,8 +88,8 @@ pipeline {
     steps {
         script {
             // Configurer le profil AWS "Abel"
-            sh 'aws configure set aws_access_key_id AKIA2MXZW63VD7RDXRBQ --profile Abel'
-            sh 'aws configure set aws_secret_access_key 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 --profile Abel'
+            sh 'aws configure set aws_access_key_id AKIA2MXZW63VMASNZDGJ --profile Abel'
+            sh 'aws configure set aws_secret_access_key  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 --profile Abel'
             sh 'aws configure set region eu-west-3 --profile Abel'
             // Mise à jour de kubeconfig pour le cluster EKS
             sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
