@@ -83,15 +83,15 @@ pipeline {
                     sh 'aws configure set aws_access_key_id AKIA2MXZW63VMASNZDGJ --profile Abel'
                     sh 'aws configure set aws_secret_access_key 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 --profile Abel'
                     sh 'aws configure set region eu-west-3 --profile Abel'
-                    
+
                     sh 'aws eks update-kubeconfig --name eks --region eu-west-3 --profile Abel'
-                    
+
                     echo "Installation Projet Devops 2023"
                     echo "Installation stack Prometheus-Grafana"
-                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
-                    --namespace kube-prometheus-stack --create-namespace \
-                    --repo https://prometheus-community.github.io/helm-charts
-                    
+                    sh '''
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml \
+                    -f myapp1/values-dev.yaml -n dev --create-namespace
                     sh '''sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                           helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml \
                           -f myapp1/values-dev.yaml -n dev --create-namespace
